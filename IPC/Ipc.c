@@ -11,11 +11,11 @@
 
 void* erzeuger( void* notused ) {
 	while(1) {
-		sem_wait(&f);					//f - 1  sonst warten
+		sem_wait(&f);				// f - 1  sonst warten
 		pthread_mutex_lock(&mutex);
 		printf("Erzeuger:    Element hinzugefügt\n");
 		pthread_mutex_unlock(&mutex);
-		sem_post(&b);					//b + 1
+		sem_post(&b);				// b + 1
 
 		int b_val;
 		int f_val;
@@ -31,15 +31,29 @@ void* erzeuger( void* notused ) {
 void* verbraucher( void* notused ) {
 	while(1) {
 		sem_wait(&b);				// b - 1 sonst warten
+		sem_wait(&b);				// b - 1 sonst warten
+		sem_wait(&b);				// b - 1 sonst warten
 		pthread_mutex_lock(&mutex);
 		printf("Verbraucher: Element entfernt \n");
 		pthread_mutex_unlock(&mutex);
-		sem_post(&f);				// f + 1 sonst waren
-		sleep(5);
+		sem_post(&f);				// f + 1
+		sem_post(&f);				// f + 1
+		sem_post(&f);				// f + 1
+		sleep(1);
 	}
 }
 
-
+/*
+void* verbraucher2( void* notused ) {
+	while(1) {
+		sem_wait(&b);				// b - 1 sonst warten
+		pthread_mutex_lock(&mutex);
+		printf("Verbraucher: Element entfernt \n");
+		pthread_mutex_unlock(&mutex);
+		sem_post(&f);				// f + 1
+		sleep(2);
+	}
+}*/
 
 int main() {
 	pthread_mutex_init(&mutex, NULL);
@@ -47,7 +61,7 @@ int main() {
 	sem_init(&b, 0, 0);
 	pthread_t dummy;
 	pthread_create(&dummy, NULL, erzeuger, NULL);
-	//pthread_create(&dummy, NULL, verbraucher, NULL);
+	pthread_create(&dummy, NULL, verbraucher, NULL);
 
 	sleep(60);
 	return 0;
